@@ -15,94 +15,94 @@ import net.objecthunter.exp4j.ExpressionBuilder;
  */
 public class ManualFitter extends PApplet {
 
-	public static void main(String[] args) {
-		PApplet.main("edu.ung.phys.ManualFitter");
-	}
+  public static void main(String[] args) {
+    PApplet.main("edu.ung.phys.ManualFitter");
+  }
 
-	
-	public Expression expr;
-	ArrayList<String> varNames;
-	ArrayList<Double> parMin, parMax, parVal, sliderX, xdata, ydata;
-	double xmin, xmax, ymin, ymax;
+
+  public Expression expr;
+  ArrayList<String> varNames;
+  ArrayList<Double> parMin, parMax, parVal, sliderX, xdata, ydata;
+  double xmin, xmax, ymin, ymax;
   int slideXstart, slideXend, slideDeltaY;
 
-	
-	public void settings() {
-		size(1200, 640);
-	}
+
+  public void settings() {
+    size(1200, 640);
+  }
 
 
-	public void setup() {
-		frameRate(20);
+  public void setup() {
+    frameRate(20);
     slideXstart = 20;
     slideXend = 295;
     slideDeltaY = 60;
-		BufferedReader fcnReader = createReader("fitFunction.txt");
-		Txt2FitFcn txt2ff = new Txt2FitFcn(fcnReader);
-		parMin = txt2ff.min;
-		parMax = txt2ff.max;
-		parVal = new ArrayList<>(parMin);
-		varNames = txt2ff.varNames;
+    BufferedReader fcnReader = createReader("fitFunction.txt");
+    Txt2FitFcn txt2ff = new Txt2FitFcn(fcnReader);
+    parMin = txt2ff.min;
+    parMax = txt2ff.max;
+    parVal = new ArrayList<>(parMin);
+    varNames = txt2ff.varNames;
     sliderX = new ArrayList<>(Collections.nCopies(parMin.size(), (double) slideXstart));
-		expr = new ExpressionBuilder(txt2ff.formattedFcn)
-				.variables(new LinkedHashSet<String>(varNames))
-				.build();
-		BufferedReader dataReader = createReader("XYdata.txt");
-		Txt2Data txt2d = new Txt2Data(dataReader);
-		xdata = txt2d.x;
-		ydata = txt2d.y;
-		xmin = Collections.min(xdata);
-		xmax = Collections.max(xdata);
-		ymin = Collections.min(ydata);
-		ymax = Collections.max(ydata);
-	}
+    expr = new ExpressionBuilder(txt2ff.formattedFcn)
+        .variables(new LinkedHashSet<String>(varNames))
+        .build();
+    BufferedReader dataReader = createReader("XYdata.txt");
+    Txt2Data txt2d = new Txt2Data(dataReader);
+    xdata = txt2d.x;
+    ydata = txt2d.y;
+    xmin = Collections.min(xdata);
+    xmax = Collections.max(xdata);
+    ymin = Collections.min(ydata);
+    ymax = Collections.max(ydata);
+  }
 
-	
-	public void draw() {
-		background(200);
+
+  public void draw() {
+    background(200);
     strokeWeight(1);
 
-		pushMatrix();
-		translate(width/4 + 45, 20);
-		scale((float) 0.7, (float) 0.92);
-		fill(240);
-		rect(0, 0, width, height);
-		plotData();
-		plotFcn();
+    pushMatrix();
+    translate(width/4 + 45, 20);
+    scale((float) 0.7, (float) 0.92);
+    fill(240);
+    rect(0, 0, width, height);
+    plotData();
+    plotFcn();
     labelAxes();
-		popMatrix();
+    popMatrix();
 
     makeSliders();
 
     update();
-	}
+  }
 
 
-	private void plotData() {
-		fill(0, 0, 255);
-		for(int k = 0; k < xdata.size(); k++) {
-			double x = ((xdata.get(k) - xmin)/(xmax - xmin))*width;
-			double y = height - ((ydata.get(k) - ymin)/(ymax - ymin))*height;
-			ellipse((float) x, (float) y, 10, 8);
-		}
-	}
-	
-	
-	private void plotFcn() {
-		fill(255, 0, 0);
-		for(int k = 0; k < 250; k++) {
-			double x = xmin + k*((xmax - xmin)/250.0);
-			expr.setVariable("x", x);
-			for(int j = 1; j < varNames.size(); j++) {
-				expr.setVariable(varNames.get(j), parVal.get(j-1));
-			}
-			double y = expr.evaluate();
-			ellipse((float) ((x-xmin)*width/(xmax-xmin)), (float) (height - (y-ymin)*height/(ymax-ymin)), 8, 6);
-		}
-	}
+  private void plotData() {
+    fill(0, 0, 255);
+    for(int k = 0; k < xdata.size(); k++) {
+      double x = ((xdata.get(k) - xmin)/(xmax - xmin))*width;
+      double y = height - ((ydata.get(k) - ymin)/(ymax - ymin))*height;
+      ellipse((float) x, (float) y, 10, 8);
+    }
+  }
 
 
-	private void labelAxes() {
+  private void plotFcn() {
+    fill(255, 0, 0);
+    for(int k = 0; k < 250; k++) {
+      double x = xmin + k*((xmax - xmin)/250.0);
+      expr.setVariable("x", x);
+      for(int j = 1; j < varNames.size(); j++) {
+        expr.setVariable(varNames.get(j), parVal.get(j-1));
+      }
+      double y = expr.evaluate();
+      ellipse((float) ((x-xmin)*width/(xmax-xmin)), (float) (height - (y-ymin)*height/(ymax-ymin)), 8, 6);
+    }
+  }
+
+
+  private void labelAxes() {
     fill(0);
     textSize(16);
     text(String.format("%3.2f", xmin), -8, height+18);
@@ -112,7 +112,7 @@ public class ManualFitter extends PApplet {
   }
 
 
-	private void makeSliders() {
+  private void makeSliders() {
     strokeWeight(3);
     for(int k = 0; k < parMin.size(); k++) {
       stroke(0);
@@ -127,7 +127,7 @@ public class ManualFitter extends PApplet {
   }
 
 
-	private void update() {
+  private void update() {
     if(mousePressed && mouseX > slideXstart && mouseX < slideXend) {
       if((mouseY%slideDeltaY < 8 || mouseY%slideDeltaY > slideDeltaY-8) && mouseY < slideDeltaY*parVal.size()+8) {
         int sliderIndex = Math.round(((float) mouseY)/slideDeltaY) - 1;
@@ -138,5 +138,5 @@ public class ManualFitter extends PApplet {
     }
   }
 
-	
+
 }
